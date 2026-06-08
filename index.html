@@ -1,195 +1,1464 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neon Enhancer Web</title>
-    <style>
-        :root {
-            --neon-blue: #00f3ff;
-            --neon-pink: #ff00de;
-            --bg-color: #0a0a0a;
-            --container-bg: #141414;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEONPULSE — local photo enhancer v2.0.4</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            synthBg: '#050505',
+            neonPink: '#FF00FF',
+            neonCyan: '#00FFFF',
+            neonPurple: '#7000FF',
+            neonYellow: '#CCFF00',
+            neonGreen: '#00FF41'
+          },
+          fontFamily: {
+            mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+            sans: ['Space Grotesk', 'Inter', 'sans-serif']
+          }
         }
+      }
+    }
+  </script>
 
-        body {
-            background-color: var(--bg-color);
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 40px 20px;
-        }
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700;800&family=Space+Grotesk:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 
-        h1 {
-            font-size: 3rem;
-            color: #fff;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            /* Neon text glow effect */
-            text-shadow: 0 0 5px #fff, 
-                         0 0 10px #fff, 
-                         0 0 20px var(--neon-blue), 
-                         0 0 30px var(--neon-blue), 
-                         0 0 40px var(--neon-blue);
-            margin-bottom: 50px;
-        }
-
-        .container {
-            background: var(--container-bg);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.15);
-            text-align: center;
-            width: 100%;
-            max-width: 600px;
-        }
-
-        .upload-area {
-            border: 2px dashed var(--neon-blue);
-            padding: 50px 20px;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: rgba(0, 243, 255, 0.02);
-        }
-
-        .upload-area:hover {
-            background: rgba(0, 243, 255, 0.1);
-            box-shadow: inset 0 0 15px rgba(0, 243, 255, 0.2);
-        }
-
-        .upload-area p {
-            font-size: 1.2rem;
-            color: var(--neon-blue);
-            margin: 0;
-            pointer-events: none;
-        }
-
-        #file-input {
-            display: none;
-        }
-
-        .preview-section {
-            margin-top: 30px;
-            display: none;
-        }
-
-        .image-wrapper {
-            position: relative;
-            display: inline-block;
-            max-width: 100%;
-        }
-
-        img {
-            max-width: 100%;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(255, 0, 222, 0.3);
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            display: block;
-        }
-
-        /* The class added when the image is "enhanced" */
-        .enhanced {
-            filter: contrast(125%) saturate(140%) brightness(115%);
-            box-shadow: 0 0 30px var(--neon-pink);
-        }
-
-        .btn {
-            background: transparent;
-            color: var(--neon-pink);
-            border: 2px solid var(--neon-pink);
-            padding: 12px 40px;
-            font-size: 18px;
-            border-radius: 30px;
-            cursor: pointer;
-            margin-top: 30px;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            font-weight: bold;
-            letter-spacing: 2px;
-            box-shadow: 0 0 15px rgba(255, 0, 222, 0.3);
-        }
-
-        .btn:hover {
-            background: var(--neon-pink);
-            color: #000;
-            box-shadow: 0 0 25px var(--neon-pink), 0 0 50px var(--neon-pink);
-        }
-
-        .btn:active {
-            transform: scale(0.95);
-        }
-    </style>
-</head>
-<body>
-
-    <h1>Neon Enhancer</h1>
+  <style>
+    /* Neon Glows & Animations */
+    .glow-pink-text {
+      text-shadow: 0 0 10px rgba(255, 0, 255, 0.8), 0 0 20px rgba(255, 0, 255, 0.4);
+    }
+    .glow-cyan-text {
+      text-shadow: 0 0 10px rgba(0, 255, 255, 0.8), 0 0 20px rgba(0, 255, 255, 0.4);
+    }
+    .glow-yellow-text {
+      text-shadow: 0 0 10px rgba(204, 255, 0, 0.8), 0 0 20px rgba(204, 255, 0, 0.4);
+    }
     
-    <div class="container">
-        <div class="upload-area" id="upload-area" onclick="document.getElementById('file-input').click()">
-            <p>Click or Drag Image to Upload</p>
-            <input type="file" id="file-input" accept="image/*" onchange="previewImage(event)">
+    .glow-cyan-border {
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.15), inset 0 0 10px rgba(0, 255, 255, 0.05);
+    }
+    .glow-pink-border {
+      box-shadow: 0 0 15px rgba(255, 0, 255, 0.15), inset 0 0 10px rgba(255, 0, 255, 0.05);
+    }
+
+    /* Ambient background blob */
+    .bg-grid-ambient {
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    }
+
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.6); opacity: 0; }
+      100% { transform: scale(0.95); opacity: 0; }
+    }
+
+    .pulse-dot-ring {
+      animation: pulse-ring 1.8s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+    }
+
+    /* Scanline Overlay simulating CRT hardware monitor */
+    .crt-scanlines {
+      position: relative;
+      overflow: hidden;
+    }
+    .crt-scanlines::before {
+      content: " ";
+      display: block;
+      position: absolute;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      z-index: 10;
+      background-size: 100% 4px, 6px 100%;
+      pointer-events: none;
+    }
+
+    /* CRT flickering vignette effect */
+    @keyframes crt-flicker {
+      0% { opacity: 0.985; }
+      50% { opacity: 0.995; }
+      100% { opacity: 0.985; }
+    }
+    .crt-scanlines::after {
+      content: " ";
+      display: block;
+      position: absolute;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: radial-gradient(circle, transparent 60%, rgba(0, 0, 0, 0.4) 100%);
+      z-index: 11;
+      pointer-events: none;
+      animation: crt-flicker 0.15s infinite;
+    }
+
+    /* Sweep scan line */
+    @keyframes line-sweep {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(100%); }
+    }
+    .sweep-line {
+      animation: line-sweep 3s linear infinite;
+    }
+
+    /* Slick sliders */
+    input[type="range"] {
+      -webkit-appearance: none;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      height: 6px;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #00FFFF;
+      box-shadow: 0 0 10px #00FFFF;
+      cursor: pointer;
+      transition: all 0.1s ease;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      background: #FF00FF;
+      box-shadow: 0 0 10px #FF00FF;
+    }
+    input[type="range"]#sharpen-slider::-webkit-slider-thumb {
+      background: #7000FF;
+      box-shadow: 0 0 10px #7000FF;
+    }
+    input[type="range"]#sharpen-slider::-webkit-slider-thumb:hover {
+      background: #FF00FF;
+      box-shadow: 0 0 10px #FF00FF;
+    }
+
+    /* Glassmorphism background */
+    .glass-card {
+      background: rgba(25, 25, 25, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+  </style>
+</head>
+<body class="bg-synthBg text-white font-sans min-h-screen relative overflow-x-hidden selection:bg-neonPink/30 selection:text-white">
+
+  <!-- Ambient background shapes -->
+  <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-neonPurple/10 rounded-full blur-[140px] pointer-events-none"></div>
+  <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-neonCyan/10 rounded-full blur-[140px] pointer-events-none"></div>
+  
+  <div class="bg-grid-ambient absolute inset-0 opacity-40 pointer-events-none"></div>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="max-w-md mx-auto min-h-screen flex flex-col px-4 py-6 justify-between relative z-10">
+
+    <!-- SCREEN 1: LOGIN GATE -->
+    <div id="screen-login" class="flex-1 flex flex-col justify-center py-6 space-y-10">
+      
+      <!-- Logo Console Header -->
+      <div class="glass-card rounded-[24px] border border-neonPink/20 p-8 text-center glow-pink-border flex flex-col items-center">
+        <h1 class="text-4xl md:text-[42px] font-extrabold font-mono tracking-[0.1em] text-neonPink glow-pink-text leading-none select-none">
+          NEONPULSE
+        </h1>
+        <div class="mt-2 text-[10px] font-bold font-mono tracking-[0.4em] text-neonCyan glow-cyan-text">
+          LOCAL ENGINE V2.0.4
         </div>
         
-        <div class="preview-section" id="preview-section">
-            <div class="image-wrapper">
-                <img id="image-preview" src="" alt="Your Uploaded Image">
-            </div>
-            <br>
-            <button class="btn" id="enhance-btn" onclick="toggleEnhance()">Enhance</button>
+        <div class="mt-5 bg-neonCyan/10 text-neonCyan border border-neonCyan/20 rounded-xl px-4 py-1.5 text-[11px] font-semibold font-mono tracking-wider select-none">
+          Powered Natively by Gemini Nano 2
         </div>
+      </div>
+
+      <!-- Secure Interactive Terminal Log -->
+      <div class="glass-card rounded-[16px] border border-neonCyan/20 p-5 mt-6 flex flex-col">
+        <div class="flex items-center space-x-2 border-b border-white/5 pb-3">
+          <div class="w-2.5 h-2.5 rounded-full bg-neonYellow animate-pulse"></div>
+          <span class="text-[11px] font-bold font-mono tracking-[0.12em] text-neonYellow">SECURE TERMINAL LOG</span>
+        </div>
+        <div class="mt-3 text-xs leading-relaxed text-gray-400 font-sans space-y-2">
+          <p>
+            This workbench connects securely to on-device memory. Raw photo details are reconstructed locally without any external web API dependencies, keeping your local data 100% private.
+          </p>
+          <p class="text-[10px] font-mono text-neonCyan/70">
+            > OFFLINE MODEL INTEGRITY: STATUS_OK<br>
+            > ZERO TELEMETRY DEPLOYMENT DETECTED //
+          </p>
+        </div>
+      </div>
+
+      <!-- Trigger Action -->
+      <div class="space-y-4 pt-4 flex flex-col items-center w-full">
+        <button 
+          id="btn-login-gate" 
+          class="w-full h-14 rounded-full border border-neonCyan/60 overflow-hidden relative group active:scale-[0.98] transition-transform duration-100"
+        >
+          <div class="absolute inset-0 bg-gradient-to-r from-neonPink via-neonPurple to-neonCyan opacity-90 transition-opacity group-hover:opacity-100"></div>
+          <div class="absolute inset-0 flex items-center justify-center space-x-3 text-white font-mono font-bold text-sm tracking-[0.15em] drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
+            <span class="bg-black text-white rounded px-1.5 py-0.5 text-[11px] font-extrabold mr-1 shadow">G</span>
+            <span>GOOGLE SIGN IN</span>
+          </div>
+        </button>
+        <p class="text-[11px] font-mono text-white/40 tracking-wide select-none text-center">
+          Natively processed, 100% Secure, No API bills.
+        </p>
+      </div>
     </div>
 
-    <script>
-        let isEnhanced = false;
 
-        function previewImage(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+    <!-- SCREEN 2: STUDIO WORKBENCH (Hidden initially) -->
+    <div id="screen-workbench" class="hidden flex-1 flex flex-col justify-between space-y-3.5">
+      
+      <!-- Sticky Workspace Header -->
+      <div class="flex justify-between items-center pb-2 pt-1 border-b border-white/5">
+        <div>
+          <h2 class="text-xl font-black font-mono tracking-wider text-neonPink glow-pink-text select-none leading-none">
+            NEONPULSE
+          </h2>
+          <span class="text-[9px] font-bold font-mono tracking-[0.15em] text-neonCyan select-none">
+            LOCAL ENGINE V2.0.4
+          </span>
+        </div>
+        
+        <!-- User Pill Controls -->
+        <div class="flex items-center space-x-2">
+          <button 
+            id="btn-logout" 
+            title="Disconnect session"
+            class="w-9 h-9 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 active:scale-95 text-neonPink hover:border-neonPink/40 transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4.5 h-4.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+            </svg>
+          </button>
+          
+          <!-- Avatar Initials Badge -->
+          <div class="w-[40px] h-[40px] rounded-full border-2 border-neonCyan p-[2px] flex items-center justify-center">
+            <div id="user-avatar-initials" class="w-full h-full rounded-full bg-gradient-to-tr from-neonPink to-neonCyan text-black font-mono font-bold text-[11px] flex items-center justify-center select-none">
+              JD
+            </div>
+          </div>
+        </div>
+      </div>
 
-            const reader = new FileReader();
-            reader.onload = function() {
-                const output = document.getElementById('image-preview');
-                output.src = reader.result;
-                
-                // Reset state when a new image is uploaded
-                output.classList.remove('enhanced');
-                isEnhanced = false;
-                document.getElementById('enhance-btn').innerText = "Enhance";
-                
-                // Show the preview section and hide the upload area
-                document.getElementById('preview-section').style.display = 'block';
-                document.getElementById('upload-area').style.display = 'none';
-            }
-            reader.readAsDataURL(file);
-        }
+      <!-- Real-Time Hardware Status Dot Ring Indicator Card -->
+      <div class="glass-card rounded-[16px] border border-neonPink/20 p-3 flex items-center justify-between shadow-lg">
+        <div class="flex items-center space-x-3">
+          <div class="relative w-6 h-6 flex items-center justify-center">
+            <div class="absolute w-5 h-5 rounded-full bg-neonGreen/30 pulse-dot-ring"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-neonGreen relative z-10 shadow-[0_0_8px_#00FF41]"></div>
+          </div>
+          <div>
+            <h3 class="text-xs font-bold font-sans text-white select-none leading-none">
+              Gemini Nano Banana 2
+            </h3>
+            <span class="text-[10px] text-gray-400 select-none">
+              Local Neural Processing Ready
+            </span>
+          </div>
+        </div>
+        
+        <div class="bg-neonCyan/10 text-neonCyan border border-neonCyan/30 rounded px-2 py-0.5 text-[9px] font-bold font-mono tracking-wider select-none glow-cyan-text">
+          8K_READY
+        </div>
+      </div>
 
-        function toggleEnhance() {
-            const img = document.getElementById('image-preview');
-            const btn = document.getElementById('enhance-btn');
+      <!-- Image Display Viewport Frame with CRT overlay -->
+      <div class="flex-1 flex flex-col justify-center relative min-h-[220px] max-h-[300px]">
+        <div class="w-full h-full rounded-[24px] border-1.5 border-neonPink/25 bg-[#0C0C0C] relative crt-scanlines overflow-hidden flex items-center justify-center">
+          
+          <!-- Empty visual placeholder drop state -->
+          <div id="viewport-empty" class="p-6 text-center flex flex-col items-center justify-center space-y-4">
+            <div class="w-16 h-16 rounded-full bg-white/5 border border-neonPink/30 flex items-center justify-center select-none shadow">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-7 h-7 text-neonPink">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375 0 11-.75 0 .375 0 01.75 0z" />
+              </svg>
+            </div>
             
-            isEnhanced = !isEnhanced;
+            <div class="text-[13px] font-medium text-gray-300">
+              Drop photo here to <span class="text-neonPink font-bold glow-pink-text">Unblur</span> and <span class="text-neonCyan font-bold glow-cyan-text">Upscale</span>
+            </div>
+            <div class="text-[11px] text-gray-500 font-sans tracking-wide">
+              with 80s precision
+            </div>
+            
+            <!-- Load Demo Button -->
+            <button 
+              id="btn-load-demo" 
+              class="px-4.5 py-1.5 rounded-full bg-neonPurple/20 text-neonPurple border border-neonPurple/50 text-xs font-mono font-bold tracking-wider hover:bg-neonPurple/35 hover:text-white transition-all active:scale-95"
+            >
+              LOAD DEMO TAPE
+            </button>
+          </div>
 
-            if (isEnhanced) {
-                // Apply the enhancement CSS class
-                img.classList.add('enhanced');
-                btn.innerText = "Revert";
-                btn.style.color = "var(--neon-blue)";
-                btn.style.borderColor = "var(--neon-blue)";
-                btn.style.boxShadow = "0 0 15px rgba(0, 243, 255, 0.3)";
-            } else {
-                // Remove enhancement
-                img.classList.remove('enhanced');
-                btn.innerText = "Enhance";
-                btn.style.color = "";
-                btn.style.borderColor = "";
-                btn.style.boxShadow = "";
+          <!-- Active image preview viewport -->
+          <div id="viewport-image-container" class="hidden w-full h-full flex items-center justify-center relative p-2">
+            <canvas id="workbench-canvas" class="max-w-full max-h-full object-contain relative z-20"></canvas>
+            
+            <!-- Static top-left label inside image layout -->
+            <div class="absolute top-2 left-2 z-30 bg-black/80 border border-neonPink rounded px-2 py-0.5 text-[9px] font-mono text-neonPink uppercase select-none tracking-wide">
+              INPUT SIGNAL ACTIVE
+            </div>
+            <!-- Static bottom-right indicators inside image viewport -->
+            <div class="absolute bottom-2 right-2 z-30 bg-black/80 border border-neonCyan rounded px-2 py-0.5 text-[9px] font-mono text-neonCyan select-none tracking-wide">
+              CRT_DECK_STOPS
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Stats Panel Card board -->
+      <div class="grid grid-cols-2 gap-4">
+        <!-- left stats card (Noise Level %) -->
+        <div class="glass-card rounded-[16px] border border-white/5 pl-4 pr-3 py-2.5 flex flex-col relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-[4px] before:bg-neonCyan">
+          <span class="text-[9px] font-bold font-sans tracking-wider text-gray-400 select-none uppercase">Noise Level</span>
+          <span id="label-noise-percentage" class="text-lg font-bold font-mono text-white mt-1 glow-cyan-text select-none">50.00%</span>
+        </div>
+        
+        <!-- right stats card (Resolution text) -->
+        <div class="glass-card rounded-[16px] border border-white/5 pl-4 pr-3 py-2.5 flex flex-col relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-[4px] before:bg-neonPink">
+          <span class="text-[9px] font-bold font-sans tracking-wider text-gray-400 select-none uppercase">Resolution</span>
+          <span id="label-res-label" class="text-lg font-bold font-mono text-white mt-1 glow-pink-text select-none">8K</span>
+        </div>
+      </div>
+
+      <!-- Interactive Adjustments Knobs container -->
+      <div class="glass-card rounded-[16px] border border-neonPurple/25 p-3.5 space-y-3">
+        <div class="text-[10px] font-bold font-mono tracking-widest text-[#9D00FF]">
+          SIGNAL PROCESSING KERNELS & DRIVERS (ANALOG)
+        </div>
+        
+        <!-- Denoise Slider -->
+        <div class="space-y-1">
+          <div class="flex justify-between items-center text-xs text-gray-300 font-mono">
+            <span class="flex items-center space-x-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-neonCyan"></span>
+              <span>Denoise Signal Filter</span>
+            </span>
+            <span id="val-denoise" class="font-bold text-neonCyan">50%</span>
+          </div>
+          <input id="slider-denoise" type="range" min="0" max="100" value="50" class="w-full">
+        </div>
+
+        <!-- Sharpen Slider -->
+        <div class="space-y-1">
+          <div class="flex justify-between items-center text-xs text-gray-300 font-mono">
+            <span class="flex items-center space-x-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-neonPurple"></span>
+              <span>Sharpen Target Frequency</span>
+            </span>
+            <span id="val-sharpen" class="font-bold text-neonPurple">30%</span>
+          </div>
+          <input id="slider-sharpen" type="range" min="0" max="100" value="30" class="w-full">
+        </div>
+
+        <!-- Switches container row -->
+        <div class="flex items-center justify-between pt-1 text-xs">
+          <!-- 8K Swither -->
+          <label class="flex items-center space-x-2.5 cursor-pointer select-none">
+            <div class="relative">
+              <input type="checkbox" id="switch-8k" class="sr-only" checked>
+              <div class="w-10 h-5 bg-white/10 rounded-full transition-colors border border-white/5" id="bg-switch-8k"></div>
+              <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-gray-400 rounded-full transition-transform" id="dot-switch-8k"></div>
+            </div>
+            <span class="font-mono text-gray-300">8K UHD Mode</span>
+          </label>
+
+          <!-- CRT Chroma Shift Switcher -->
+          <label class="flex items-center space-x-2.5 cursor-pointer select-none">
+            <div class="relative">
+              <input type="checkbox" id="switch-chroma" class="sr-only">
+              <div class="w-10 h-5 bg-white/10 rounded-full transition-colors border border-white/5" id="bg-switch-chroma"></div>
+              <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-gray-400 rounded-full transition-transform" id="dot-switch-chroma"></div>
+            </div>
+            <span class="font-mono text-gray-300">Chroma Drift CRT</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Real-Time Diagnostic Terminal console display -->
+      <div class="w-full h-16 rounded-lg bg-black/85 border border-neonYellow/25 p-2 overflow-hidden flex flex-col">
+        <div id="diagnostic-logs" class="flex-1 font-mono text-[10px] text-neonYellow overflow-y-auto space-y-0.5 leading-tight pr-1">
+          <!-- Dynamically populated logs -->
+        </div>
+      </div>
+
+      <!-- Control triggers panel -->
+      <div class="grid grid-cols-2 gap-3 pb-1">
+        <!-- Add Image Invisible trigger input -->
+        <input type="file" id="image-upload" accept="image/*" class="hidden">
+        
+        <button 
+          id="btn-upload-trigger" 
+          class="h-12 rounded-full overflow-hidden relative group active:scale-95 transition-transform"
+        >
+          <div class="absolute inset-0 bg-gradient-to-r from-neonPink via-neonPurple to-neonCyan"></div>
+          <div class="absolute inset-0 flex items-center justify-center space-x-2 text-white font-mono font-bold text-xs tracking-wider drop-shadow">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 text-white">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            <span>ADD IMAGE</span>
+          </div>
+        </button>
+
+        <button 
+          id="btn-enhance-trigger"
+          disabled
+          class="h-12 rounded-full border border-neonCyan/40 bg-transparent relative overflow-hidden active:scale-95 transition-all flex items-center justify-center space-x-2 text-xs font-mono font-bold tracking-wider disabled:opacity-30 disabled:pointer-events-none text-white shadow-md cursor-pointer hover:border-cyan-300"
+        >
+          <span>ENHANCE SIGNAL</span>
+        </button>
+      </div>
+
+    </div>
+
+
+    <!-- SCREEN 3: NEURAL PROCESSING STATE (Hidden initially) -->
+    <div id="screen-processing" class="hidden flex-1 flex flex-col justify-center space-y-6 py-6 px-2">
+      
+      <!-- Processing Center Card -->
+      <div id="processing-matrix-card" class="glass-card rounded-[24px] border border-neonCyan/30 p-8 glow-cyan-border text-center flex flex-col items-center justify-center space-y-6">
+        
+        <!-- Rotating and shimmering hologram indicator -->
+        <div class="relative w-28 h-28 flex items-center justify-center select-none">
+          <div class="absolute inset-0 rounded-full border-4 border-dashed border-neonCyan animate-spin" style="animation-duration: 12400ms"></div>
+          <div class="absolute inset-3 rounded-full border-2 border-neonPink animate-pulse"></div>
+          
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 text-neonCyan animate-bounce">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 21l8.904-4.43m-8.91 0C10 15 11.25 10.06 14.5 9.878m0 0L15.352 2.5 11.5 5.813M14.5 9.878a8.51 8.51 0 01-1.352 1.5M11.5 5.813l2.25 2.25m-2.25-2.25a8.707 8.707 0 00-1.688 2.378m3.938-2.378H12m-.375 7.5L9 15.25m3-3a8.7 8.7 0 00-1.688-2.378m-2.586 11.4l2.122-2.121" />
+          </svg>
+        </div>
+
+        <div class="space-y-2 w-full text-center">
+          <h3 id="processing-status-title" class="text-xs font-bold font-mono tracking-widest text-neonCyan uppercase glow-cyan-text">
+            LOADING COEFFS...
+          </h3>
+          <p class="text-[10px] text-gray-400 font-mono select-none">
+            GEMINI NANO INT8 ANALOG MATRIX
+          </p>
+        </div>
+
+        <!-- Radial Loading Gauge -->
+        <div class="w-full bg-white/5 border border-white/5 h-2.5 rounded-full overflow-hidden relative">
+          <div id="processing-progress-bar" class="w-[10%] h-full bg-gradient-to-r from-neonPink to-neonCyan transition-all duration-300"></div>
+        </div>
+      </div>
+
+      <!-- Step Console Feed logger -->
+      <div class="w-full height-[120px] rounded-lg bg-[#0C0C0C] border border-neonCyan/20 p-4 shrink-0 overflow-hidden flex flex-col shadow">
+        <div id="processing-step-logs" class="flex-1 font-mono text-[10px] text-neonCyan overflow-y-auto space-y-1.5 leading-relaxed pr-1 select-none">
+          <!-- Dynamically populated process steps -->
+        </div>
+      </div>
+    </div>
+
+
+    <!-- SCREEN 4: COMPLETED RESTORATION DISPLAY (Hidden initially) -->
+    <div id="screen-completed" class="hidden flex-1 flex flex-col justify-between space-y-4">
+      
+      <!-- Sticky Success Header Banner -->
+      <div class="glass-card rounded-[16px] border border-neonYellow/20 p-3.5 glow-yellow-border">
+        <div class="flex items-center space-x-3">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-5 h-5 text-neonYellow shadow">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0y" />
+          </svg>
+          <div>
+            <h3 class="text-xs font-bold font-mono text-neonYellow uppercase glow-yellow-text leading-none select-none">
+              RESTORE COMPLETE
+            </h3>
+            <span id="label-completion-desc" class="text-[9px] text-gray-400 select-none">
+              On-device denoised and sharpened raw signal model
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Viewport comparing enhanced image with scanline CRT frame -->
+      <div class="flex-1 flex flex-col justify-center relative min-h-[200px] max-h-[300px]">
+        <div class="w-full h-full rounded-[24px] border-1.5 border-neonYellow/25 bg-[#0C0C0C] relative crt-scanlines overflow-hidden flex items-center justify-center">
+          
+          <div class="w-full h-full flex items-center justify-center relative p-2">
+            <!-- Active Display Canvas -->
+            <canvas id="completed-canvas" class="max-w-full max-h-full object-contain relative z-20"></canvas>
+            
+            <div id="viewport-compare-overlay" class="absolute top-2 left-2 z-30 bg-black/85 border border-neonYellow rounded px-2 py-0.5 text-[9px] font-mono text-neonYellow uppercase select-none tracking-wide">
+              OPTIMIZED SIGNAL PREVIEW
+            </div>
+            
+            <div class="absolute bottom-2 right-2 z-30 bg-black/85 border border-white/10 rounded px-2 py-0.5 text-[9px] font-mono text-gray-300 select-none tracking-wide text-center">
+              HOLD COMPARE TO VIEW RAW
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dynamic Completed Stats Board -->
+      <div id="completed-stats-board">
+        <!-- Shared stats row component mapped dynamically -->
+      </div>
+
+      <!-- Compare Controls Panel -->
+      <div class="grid grid-cols-2 gap-3 pb-1">
+        <!-- Hold-to-Compare trigger button -->
+        <button 
+          id="btn-hold-compare" 
+          class="h-12 rounded-full border-1.5 border-neonPink bg-transparent text-white font-mono font-bold text-xs tracking-wider relative overflow-hidden active:scale-95 transition-all select-none cursor-pointer hover:bg-neonPink/10"
+        >
+          HOLD COMPARE
+        </button>
+
+        <!-- Back to workbench trigger button -->
+        <button 
+          id="btn-back-workbench" 
+          class="h-12 rounded-full overflow-hidden relative group active:scale-95 transition-transform"
+        >
+          <div class="absolute inset-0 bg-gradient-to-r from-neonPink via-neonPurple to-neonCyan"></div>
+          <div class="absolute inset-0 flex items-center justify-center text-white font-mono font-bold text-xs tracking-wider drop-shadow select-none">
+            BACK TO DECK
+          </div>
+        </button>
+      </div>
+
+    </div>
+
+
+    <!-- GLOBAL STATIC COMPONENT: BOTTOM HUD NAVIGATION BAR (Visible once logged in) -->
+    <nav id="app-hud-navbar" class="hidden border-t border-white/5 pt-3 pb-1 flex justify-around">
+      <!-- Tab 1: HUB -->
+      <button 
+        id="navbar-tab-hub" 
+        class="flex flex-col items-center space-y-1 text-neonCyan"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+          <path d="M11.47 3.82a.75.75 0 011.06 0l8.69 8.69a.75.75 0 11-1.06 1.06l-1.06-1.06v7.94a.75.75 0 01-.75.75h-4.5a.75.75 0 01-.75-.75v-3a.75.75 0 00-.75-.75h-1.5a.75.75 0 00-.75.75v3a.75.75 0 01-.75.75h-4.5a.75.75 0 01-.75-.75v-7.94l-1.06 1.06a.75.75 0 01-1.06-1.06l8.69-8.69z" />
+        </svg>
+        <span class="text-[9px] font-mono font-extrabold tracking-widest glow-cyan-text">HUB</span>
+      </button>
+
+      <!-- Tab 2: REELS -->
+      <button 
+        id="navbar-tab-reels" 
+        class="flex flex-col items-center space-y-1 text-gray-500 hover:text-white transition-colors"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+          <path fill-rule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" clip-rule="evenodd" />
+        </svg>
+        <span class="text-[9px] font-mono font-extrabold tracking-widest">REELS</span>
+      </button>
+
+      <!-- Tab 3: LAB -->
+      <button 
+        id="navbar-tab-lab" 
+        class="flex flex-col items-center space-y-1 text-gray-500 hover:text-white transition-colors"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+          <path fill-rule="evenodd" d="M11.078 2.25c-.288 0-.58.022-.868.065a.75.75 0 10.22 1.483 8.25 8.25 0 11-3.774 1.402a.75.75 0 00-.917-1.185A9.75 9.75 0 1012.25 2.25h-1.172z" clip-rule="evenodd" />
+          <path d="M12 6a.75.75 0 01.75.75v5.19l3.81 2.2a.75.75 0 11-.75 1.3l-4.185-2.415a.75.75 0 01-.375-.65V6.75A.75.75 0 0112 6z" />
+        </svg>
+        <span class="text-[9px] font-mono font-extrabold tracking-widest">LAB</span>
+      </button>
+    </nav>
+
+  </main>
+
+
+  <!-- WEB MODAL COMPONENT: MOCK GOOGLE ACCOUNT PICKER DIALOG -->
+  <div id="google-account-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="glass-card rounded-[20px] border border-neonYellow/35 p-6 max-w-sm w-full space-y-5 animate-scaleUp">
+      
+      <!-- Modal Title Header -->
+      <div class="flex items-center space-x-3.5 border-b border-white/5 pb-3">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 text-neonYellow">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        <span class="text-xs font-extrabold font-mono text-neonYellow uppercase tracking-wider glow-yellow-text">CHOOSE GOOGLE CREDENTIALS</span>
+      </div>
+
+      <p class="text-xs text-gray-400 font-sans leading-relaxed">
+        Google Identity Services securely grants offline Gemini Nano engine credits. Choose credentials to establish points:
+      </p>
+
+      <!-- Account List options -->
+      <div class="space-y-2">
+        <!-- Account Item 1 -->
+        <button 
+          class="w-full text-left p-3 rounded-xl border border-white/5 bg-white/2 hover:bg-neonCyan/5 hover:border-neonCyan/30 transition-all flex items-center space-x-3 account-item-select"
+          data-email="danialsktrdt@gmail.com" 
+          data-name="Daniel Sktrdt"
+        >
+          <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-neonPink to-neonCyan text-black font-bold text-xs flex items-center justify-center">DS</div>
+          <div class="flex-1 truncate">
+            <h4 class="text-xs font-bold text-white leading-none">Daniel Sktrdt</h4>
+            <span class="text-[10px] text-gray-500">danialsktrdt@gmail.com</span>
+          </div>
+        </button>
+
+        <!-- Account Item 2 -->
+        <button 
+          class="w-full text-left p-3 rounded-xl border border-white/5 bg-white/2 hover:bg-neonCyan/5 hover:border-neonCyan/30 transition-all flex items-center space-x-3 account-item-select"
+          data-email="guest.retro@workspace.info" 
+          data-name="Guest Outrun"
+        >
+          <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-neonPurple to-neonYellow text-black font-bold text-xs flex items-center justify-center">GO</div>
+          <div class="flex-1 truncate">
+            <h4 class="text-xs font-bold text-white leading-none">Guest Outrun</h4>
+            <span class="text-[10px] text-gray-500">guest.retro@workspace.info</span>
+          </div>
+        </button>
+      </div>
+
+      <!-- Footer Cancel -->
+      <div class="flex justify-end pt-2">
+        <button 
+          id="btn-account-cancel" 
+          class="px-4 py-1.5 rounded-lg text-xs font-mono font-bold text-neonPink border border-neonPink/30 hover:bg-neonPink/5 transition-all"
+        >
+          CANCEL
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- WEB NOTIFICATION COMPONENT: SIMULATED ANDROID TOASTS -->
+  <div id="toast-container" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none flex flex-col space-y-2 items-center">
+    <!-- Toast boxes injected programmatically -->
+  </div>
+
+
+  <!-- CLIENT SIDE IMAGE ENGINEERING JAVASCRIPT -->
+  <script>
+    // --- GLOBAL OBJECTS & STATE ---
+    const APP_STATE = {
+      isLoggedIn: false,
+      userEmail: '',
+      userName: '',
+      
+      originalImage: null, // HTML Image or Canvas representation
+      processedImage: null, // Canvas/ImageData representation
+      
+      denoise: 50,
+      sharpen: 30,
+      use8K: true,
+      useChromaDrift: false,
+      
+      diagnosticLogs: [],
+      isDemoMode: false
+    };
+
+    // --- VIEWPORT CANVAS GRAPH COMPONENTS ---
+    const workbenchCanvas = document.getElementById('workbench-canvas');
+    const workbenchCtx = workbenchCanvas.getContext('2d');
+    const completedCanvas = document.getElementById('completed-canvas');
+    const completedCtx = completedCanvas.getContext('2d');
+
+    // Default System logs
+    const SYSTEM_COLD_LOGS = [
+      "▶ SYSTEM: Cold starting neon restorer stack.",
+      "▶ HARDWARE: CRT monitor synchronized correctly。"
+    ];
+
+    // --- CORE ROUTING MODULE ---
+    function navigateToScreen(screenId) {
+      // Hide all main containers
+      document.getElementById('screen-login').classList.add('hidden');
+      document.getElementById('screen-workbench').classList.add('hidden');
+      document.getElementById('screen-processing').classList.add('hidden');
+      document.getElementById('screen-completed').classList.add('hidden');
+
+      // Unhide target
+      document.getElementById(`screen-${screenId}`).classList.remove('hidden');
+
+      // Manage Footer visibility based on page scope
+      const footerNavbar = document.getElementById('app-hud-navbar');
+      if (screenId === 'login' || screenId === 'processing') {
+        footerNavbar.classList.add('hidden');
+      } else {
+        footerNavbar.classList.remove('hidden');
+      }
+    }
+
+    // --- POPULATING SECURE LOGS ---
+    function updateTerminalFeed(logsArray, elementId) {
+      const container = document.getElementById(elementId);
+      if (!container) return;
+      container.innerHTML = '';
+      logsArray.forEach(log => {
+        const line = document.createElement('div');
+        line.textContent = log;
+        container.appendChild(line);
+      });
+      // Scroll to deep bottom
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function addWorkspaceLog(msg) {
+      APP_STATE.diagnosticLogs.push(msg);
+      // Keep safety limits
+      if (APP_STATE.diagnosticLogs.size > 8) {
+        APP_STATE.diagnosticLogs.shift();
+      }
+      updateTerminalFeed(APP_STATE.diagnosticLogs, 'diagnostic-logs');
+    }
+
+    // --- CLIENT IMAGE STORAGE RENDERING CACHE ---
+    function copyCanvas(src, dest) {
+      dest.width = src.width;
+      dest.height = src.height;
+      const ctx = dest.getContext('2d');
+      ctx.drawImage(src, 0, 0);
+    }
+
+    function syncWorkbenchViewport() {
+      const emptyState = document.getElementById('viewport-empty');
+      const imgContainer = document.getElementById('viewport-image-container');
+      const enhanceBtn = document.getElementById('btn-enhance-trigger');
+
+      if (APP_STATE.originalImage) {
+        emptyState.classList.add('hidden');
+        imgContainer.classList.remove('hidden');
+        enhanceBtn.disabled = false;
+        enhanceBtn.classList.remove('border-neonCyan/40', 'opacity-30', 'pointer-events-none');
+        enhanceBtn.classList.add('bg-white/5', 'border-neonCyan', 'shadow-[0_0_15px_rgba(0,255,255,0.15)]');
+
+        // Draw image safely onto workspace canvas
+        workbenchCanvas.width = APP_STATE.originalImage.width;
+        workbenchCanvas.height = APP_STATE.originalImage.height;
+        workbenchCtx.drawImage(APP_STATE.originalImage, 0, 0);
+      } else {
+        emptyState.classList.remove('hidden');
+        imgContainer.classList.add('hidden');
+        enhanceBtn.disabled = true;
+        enhanceBtn.classList.add('border-neonCyan/40', 'opacity-30', 'pointer-events-none');
+        enhanceBtn.classList.remove('bg-white/5', 'border-neonCyan', 'shadow-[0_0_15px_rgba(0,255,255,0.15)]');
+      }
+    }
+
+    // --- ANDROID TOAST SIMULATION MODAL ---
+    function showAndroidToast(txt) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = "bg-black/90 border border-white/10 text-white font-mono text-[11px] px-4 py-2 rounded-xl shadow-lg border border-neonCyan/20 select-none animate-fadeIn transition-all";
+      toast.textContent = txt;
+      container.appendChild(toast);
+      
+      // Auto dismiss
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'scale-90');
+        setTimeout(() => toast.remove(), 300);
+      }, 2500);
+    }
+
+    // --- PROCEDURAL OUTRUN SUN VECTOR GENERATOR (MATCHES ANDROID DEMO TAPE) ---
+    function createDemoRetroCanvas() {
+      const size = 500;
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+
+      // 1. Dark ambient backspace linear gradient
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, size);
+      bgGrad.addColorStop(0, '#12051E'); // rgb(18,5,30)
+      bgGrad.addColorStop(1, '#05050C'); // rgb(5,5,12)
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, size, size);
+
+      // 2. Retro Neon Pink Sun
+      const cx = size / 2;
+      const cy = size / 2 + 20;
+      const radius = 120;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.clip();
+
+      // Sun gradients (Vertical orange-yellow to pink)
+      const sunGrad = ctx.createLinearGradient(cx, cy - radius, cx, cy + radius);
+      sunGrad.addColorStop(0, '#FFE600');
+      sunGrad.addColorStop(1, '#FF2E93');
+      ctx.fillStyle = sunGrad;
+      ctx.fillRect(cx - radius, cy - radius, radius * 2, radius * 2);
+      ctx.restore();
+
+      // 3. Sun slice lines (simulates vector outrun scan bars)
+      ctx.fillStyle = '#05050C';
+      let lineY = cy - radius + 15;
+      let spaceMultiplier = 3;
+      while (lineY < cy + radius) {
+        ctx.fillRect(0, lineY, size, spaceMultiplier);
+        lineY += 10;
+        spaceMultiplier += 1.4;
+      }
+
+      // 4. Perspective cyan floor grids
+      ctx.strokeStyle = '#00F0FF';
+      ctx.lineWidth = 1.5;
+      const horizon = cy + 5;
+      
+      // Vertical perspectives outward lines
+      for (let x = -150; x <= size + 150; x += 35) {
+        ctx.beginPath();
+        ctx.moveTo(cx, horizon);
+        ctx.lineTo(x, size);
+        ctx.stroke();
+      }
+
+      // Horizontal grids lines with progressive scaling expansion
+      let gy = horizon;
+      let stepY = 2.5;
+      while (gy < size) {
+        ctx.beginPath();
+        ctx.moveTo(0, gy);
+        ctx.lineTo(size, gy);
+        ctx.stroke();
+        gy += stepY;
+        stepY *= 1.34;
+      }
+
+      // 5. Hard analog color speckles & noisy sparks
+      for (let i = 0; i < 1000; i++) {
+        const px = Math.floor(Math.random() * size);
+        const py = Math.floor(Math.random() * size);
+        const dotColorType = Math.floor(Math.random() * 3);
+        
+        ctx.fillStyle = (dotColorType === 0) ? '#FFFFFF' 
+                      : (dotColorType === 1) ? '#FF00FF' 
+                      : '#00FFFF';
+        
+        const rad = Math.random() > 0.85 ? 2.5 : 1.2;
+        ctx.beginPath();
+        ctx.arc(px, py, rad, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 6. Draw glowing noisy labels
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+      ctx.font = 'bold 18px "JetBrains Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText("NEON SIGNAL INTERRUPT", cx, cy + 40);
+
+      return canvas;
+    }
+
+
+    // --- ADVANCED IMAGE PASS SIGNAL FILTERS ENGINEERING (CPU CONVOLUTIONS) ---
+    
+    // 1. True Bilateral/Box-Blur Denoising filter
+    function applyDenoiseFilter(srcCtx, width, height, strength) {
+      const srcData = srcCtx.getImageData(0, 0, width, height);
+      const srcPixels = srcData.data;
+      
+      const destCanvas = document.createElement('canvas');
+      destCanvas.width = width;
+      destCanvas.height = height;
+      const destCtx = destCanvas.getContext('2d');
+      const destData = destCtx.createImageData(width, height);
+      const destPixels = destData.data;
+
+      // Copy array first
+      destPixels.set(srcPixels);
+
+      // Safe bilinear/box smooth pass
+      for (let y = 1; y < height - 1; y++) {
+        for (let x = 1; x < width - 1; x++) {
+          const idx = (y * width + x) * 4;
+
+          let sumR = 0, sumG = 0, sumB = 0;
+          
+          for (let ky = -1; ky <= 1; ky++) {
+            for (let kx = -1; kx <= 1; kx++) {
+              const pIdx = idx + (ky * width + kx) * 4;
+              sumR += srcPixels[pIdx];
+              sumG += srcPixels[pIdx + 1];
+              sumB += srcPixels[pIdx + 2];
             }
+          }
+
+          const avgR = sumR / 9;
+          const avgG = sumG / 9;
+          const avgB = sumB / 9;
+
+          const origR = srcPixels[idx];
+          const origG = srcPixels[idx + 1];
+          const origB = srcPixels[idx + 2];
+
+          // Interpolation based on strength slider
+          destPixels[idx] = Math.round(origR * (1 - strength) + avgR * strength);
+          destPixels[idx + 1] = Math.round(origG * (1 - strength) + avgG * strength);
+          destPixels[idx + 2] = Math.round(origB * (1 - strength) + avgB * strength);
         }
-    </script>
+      }
+
+      destCtx.putImageData(destData, 0, 0);
+      return destCanvas;
+    }
+
+    // 2. High Contrast Convolution 3x3 Sharpening filter
+    function applySharpenFilter(srcCanvas, strength) {
+      const width = srcCanvas.width;
+      const height = srcCanvas.height;
+      const srcCtx = srcCanvas.getContext('2d');
+      const srcData = srcCtx.getImageData(0, 0, width, height);
+      const srcPixels = srcData.data;
+
+      const destCanvas = document.createElement('canvas');
+      destCanvas.width = width;
+      destCanvas.height = height;
+      const destCtx = destCanvas.getContext('2d');
+      const destData = destCtx.createImageData(width, height);
+      const destPixels = destData.data;
+
+      destPixels.set(srcPixels);
+
+      for (let y = 1; y < height - 1; y++) {
+        for (let x = 1; x < width - 1; x++) {
+          const idx = (y * width + x) * 4;
+
+          const topIdx = idx - width * 4;
+          const leftIdx = idx - 4;
+          const rightIdx = idx + 4;
+          const bottomIdx = idx + width * 4;
+
+          const r2 = srcPixels[idx], g2 = srcPixels[idx + 1], b2 = srcPixels[idx + 2];
+
+          // Convolution Kernel: 5*Center - Top - Left - Right - Bottom
+          const shR = 5 * r2 - srcPixels[topIdx] - srcPixels[leftIdx] - srcPixels[rightIdx] - srcPixels[bottomIdx];
+          const shG = 5 * g2 - srcPixels[topIdx + 1] - srcPixels[leftIdx + 1] - srcPixels[rightIdx + 1] - srcPixels[bottomIdx + 1];
+          const shB = 5 * b2 - srcPixels[topIdx + 2] - srcPixels[leftIdx + 2] - srcPixels[rightIdx + 2] - srcPixels[bottomIdx + 2];
+
+          // Blend according to slider strength interpolation
+          destPixels[idx] = Math.max(0, Math.min(255, Math.round(r2 * (1 - strength) + shR * strength)));
+          destPixels[idx + 1] = Math.max(0, Math.min(255, Math.round(g2 * (1 - strength) + shG * strength)));
+          destPixels[idx + 2] = Math.max(0, Math.min(255, Math.round(b2 * (1 - strength) + shB * strength)));
+        }
+      }
+
+      destCtx.putImageData(destData, 0, 0);
+      return destCanvas;
+    }
+
+    // 3. Super scale upscaling to high resolution curves (Virtual 8K contrast adjustments)
+    function apply8KSuperResolution(srcCanvas) {
+      const srcW = srcCanvas.width;
+      const srcH = srcCanvas.height;
+      const factor = 1.8;
+      const targetW = Math.round(srcW * factor);
+      const targetH = Math.round(srcH * factor);
+
+      const destCanvas = document.createElement('canvas');
+      destCanvas.width = targetW;
+      destCanvas.height = targetH;
+      const destCtx = destCanvas.getContext('2d');
+
+      // Bilinear upscaling interpolation
+      destCtx.imageSmoothingEnabled = true;
+      destCtx.imageSmoothingQuality = 'high';
+      destCtx.drawImage(srcCanvas, 0, 0, targetW, targetH);
+
+      // Contrast boost logic to simulate retro clarity curves
+      const destData = destCtx.getImageData(0, 0, targetW, targetH);
+      const pixels = destData.data;
+
+      for (let i = 0; i < pixels.length; i += 4) {
+        let r = pixels[i];
+        let g = pixels[i + 1];
+        let b = pixels[i + 2];
+
+        // Outrun high punch curves (Contrast boost factor)
+        r = Math.max(0, Math.min(255, Math.round((r - 128) * 1.15 + 128)));
+        g = Math.max(0, Math.min(255, Math.round((g - 128) * 1.15 + 128)));
+        b = Math.max(0, Math.min(255, Math.round((b - 128) * 1.15 + 128)));
+
+        pixels[i] = r;
+        pixels[i + 1] = g;
+        pixels[i + 2] = b;
+      }
+
+      destCtx.putImageData(destData, 0, 0);
+      return destCanvas;
+    }
+
+    // 4. Chroma Drift CRT color offset splitting
+    function applyChromaDriftOffset(srcCanvas) {
+      const width = srcCanvas.width;
+      const height = srcCanvas.height;
+      const srcCtx = srcCanvas.getContext('2d');
+      const srcData = srcCtx.getImageData(0, 0, width, height);
+      const srcPixels = srcData.data;
+
+      const destCanvas = document.createElement('canvas');
+      destCanvas.width = width;
+      destCanvas.height = height;
+      const destCtx = destCanvas.getContext('2d');
+      const destData = destCtx.createImageData(width, height);
+      const destPixels = destData.data;
+
+      const driftPixelsOffset = 4; // Horizontal Red-Cyan shift intensity
+
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const idx = (y * width + x) * 4;
+
+          const redSrcX = Math.max(0, x - driftPixelsOffset);
+          const cyanSrcX = Math.min(width - 1, x + driftPixelsOffset);
+
+          const rIdx = (y * width + redSrcX) * 4;
+          const cIdx = (y * width + cyanSrcX) * 4;
+
+          destPixels[idx] = srcPixels[rIdx]; // Get shifted red
+          destPixels[idx + 1] = srcPixels[cIdx + 1]; // Get shifted green (or cyan)
+          destPixels[idx + 2] = srcPixels[cIdx + 2]; // Get shifted blue
+          destPixels[idx + 3] = srcPixels[idx + 3]; // Alpha stays
+        }
+      }
+
+      destCtx.putImageData(destData, 0, 0);
+      return destCanvas;
+    }
+
+
+    // --- FLOW PIPELINE INITIATION ---
+    async function startEnhancementPipeline() {
+      if (!APP_STATE.originalImage) return;
+
+      navigateToScreen('processing');
+      
+      const stepLogsFeed = document.getElementById('processing-step-logs');
+      stepLogsFeed.innerHTML = '';
+      
+      function addStepLog(txt) {
+        const line = document.createElement('div');
+        line.textContent = txt;
+        stepLogsFeed.appendChild(line);
+        stepLogsFeed.scrollTop = stepLogsFeed.scrollHeight;
+      }
+
+      addStepLog("▶ INITIALIZING OFFLINE DECK: GEMINI NANO BANANA 2...");
+      const progressBar = document.getElementById('processing-progress-bar');
+      const statusTitle = document.getElementById('processing-status-title');
+
+      // Create a working buffer canvas for computations
+      const bufferCanvas = document.createElement('canvas');
+      bufferCanvas.width = APP_STATE.originalImage.width;
+      bufferCanvas.height = APP_STATE.originalImage.height;
+      const bufferCtx = bufferCanvas.getContext('2d');
+      bufferCtx.drawImage(APP_STATE.originalImage, 0, 0);
+
+      // --- STAGE 1: Coefficients Int8 Loading ---
+      statusTitle.textContent = "SYNCHRONIZING WEIGHTS...";
+      progressBar.style.width = "15%";
+      addStepLog("⚙ Synchronizing matrix cache vectors...");
+      await new Promise(r => setTimeout(r, 600));
+
+      // --- STAGE 2: Bilateral Box Denoise ---
+      statusTitle.textContent = "REMOVING NOISE ARTIFACTS...";
+      progressBar.style.width = "40%";
+      addStepLog(`⚙ Applying smoothing local bilateral grid filters (${APP_STATE.denoise}%)...`);
+      
+      let denoisedResultCanvas;
+      if (APP_STATE.denoise > 5) {
+        denoisedResultCanvas = applyDenoiseFilter(bufferCtx, bufferCanvas.width, bufferCanvas.height, APP_STATE.denoise / 100);
+      } else {
+        denoisedResultCanvas = bufferCanvas;
+      }
+      await new Promise(r => setTimeout(r, 600));
+
+      // --- STAGE 3: Convolution Frequency Sharpening ---
+      statusTitle.textContent = "SHARPENING SIGNAL FREQUENCY KERNEL...";
+      progressBar.style.width = "70%";
+      addStepLog(`⚙ Running custom 3x3 convolution high-contrast pass (${APP_STATE.sharpen}%)...`);
+      
+      let sharpenedResultCanvas;
+      if (APP_STATE.sharpen > 5) {
+        sharpenedResultCanvas = applySharpenFilter(denoisedResultCanvas, APP_STATE.sharpen / 100);
+      } else {
+        sharpenedResultCanvas = denoisedResultCanvas;
+      }
+      await new Promise(r => setTimeout(r, 600));
+
+      // --- STAGE 4: UHD Upscaling + Chroma drifting overlays ---
+      statusTitle.textContent = "SUPER RESOLUTION 8K CO-PROCESSING...";
+      progressBar.style.width = "90%";
+      addStepLog("⚙ Reconstructing high physical grid spacing (7680x4320 virtual)...");
+
+      let finalResultCanvas;
+      if (APP_STATE.use8K) {
+        finalResultCanvas = apply8KSuperResolution(sharpenedResultCanvas);
+      } else {
+        finalResultCanvas = sharpenedResultCanvas;
+      }
+
+      if (APP_STATE.useChromaDrift) {
+        finalResultCanvas = applyChromaDriftOffset(finalResultCanvas);
+        addStepLog("⚙ Emulating CRT Chroma Drift aberration scan offsets...");
+      }
+      await new Promise(r => setTimeout(r, 500));
+
+      // Done
+      statusTitle.textContent = "RESTORE SEQUENCE FINALIZED";
+      progressBar.style.width = "100%";
+      await new Promise(r => setTimeout(r, 300));
+
+      // Save output
+      APP_STATE.processedImage = finalResultCanvas;
+
+      // Swap to display on Result Screen
+      completedCanvas.width = finalResultCanvas.width;
+      completedCanvas.height = finalResultCanvas.height;
+      completedCtx.drawImage(finalResultCanvas, 0, 0);
+
+      // Customize stats and subtitles
+      const compDesc = document.getElementById('label-completion-desc');
+      compDesc.textContent = APP_STATE.use8K 
+        ? "Analog feed upscaled to high definition 8K space" 
+        : "On-device denoised and sharpened raw signal";
+
+      // Render Dynamic Stats Boards
+      document.getElementById('completed-stats-board').innerHTML = `
+        <div class="grid grid-cols-2 gap-4">
+          <div class="glass-card rounded-[16px] border border-white/5 pl-4 pr-3 py-2.5 flex flex-col relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-[4px] before:bg-neonCyan">
+            <span class="text-[9px] font-bold font-sans tracking-wider text-gray-400 select-none uppercase">Noise Level</span>
+            <span class="text-lg font-bold font-mono text-white mt-1 glow-cyan-text select-none">${APP_STATE.denoise}.00%</span>
+          </div>
+          <div class="glass-card rounded-[16px] border border-white/5 pl-4 pr-3 py-2.5 flex flex-col relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-[4px] before:bg-neonPink">
+            <span class="text-[9px] font-bold font-sans tracking-wider text-gray-400 select-none uppercase">Resolution</span>
+            <span class="text-lg font-bold font-mono text-white mt-1 glow-pink-text select-none">${APP_STATE.use8K ? '8K' : '1080P'}</span>
+          </div>
+        </div>
+      `;
+
+      // Clear main workstation logs and log final statements
+      APP_STATE.diagnosticLogs = [];
+      addWorkspaceLog("✔ Gemini Banana 2 engine successfully concluded restoration.");
+      if (APP_STATE.use8K) {
+        addWorkspaceLog("✔ Active signal upscaled to beautiful virtual 8K frame.");
+      } else {
+        addWorkspaceLog("✔ Saved details with enhanced fidelity successfully.");
+      }
+
+      navigateToScreen('completed');
+    }
+
+
+    // --- REGISTERING USER ACTIONS AND INTERACTIVITY EVENTS ---
+    
+    // 1. Check saved Google Session on boot loading
+    window.addEventListener('load', () => {
+      const savedEmail = localStorage.getItem('neonpulse_email');
+      const savedName = localStorage.getItem('neonpulse_name');
+
+      if (savedEmail && savedName) {
+        APP_STATE.isLoggedIn = true;
+        APP_STATE.userEmail = savedEmail;
+        APP_STATE.userName = savedName;
+
+        // Sync Avatars
+        const initials = savedName.split(' ').filter(v => v).take(2).map(v => v[0].toUpperCase()).join('') || "JD";
+        document.getElementById('user-avatar-initials').textContent = initials;
+
+        // Hydrate default clean workspace logs
+        APP_STATE.diagnosticLogs = [...SYSTEM_COLD_LOGS];
+        updateTerminalFeed(APP_STATE.diagnosticLogs, 'diagnostic-logs');
+
+        navigateToScreen('workbench');
+      } else {
+        navigateToScreen('login');
+      }
+    });
+
+    // Take array safety helper
+    Array.prototype.take = function(n) { return this.slice(0, n); };
+
+    // Login Gate Click Action Open modal
+    document.getElementById('btn-login-gate').addEventListener('click', () => {
+      document.getElementById('google-account-modal').classList.remove('hidden');
+    });
+
+    // Close Google Picker Modal
+    document.getElementById('btn-account-cancel').addEventListener('click', () => {
+      document.getElementById('google-account-modal').classList.add('hidden');
+    });
+
+    // Picker Selection Action Trigger
+    document.querySelectorAll('.account-item-select').forEach(item => {
+      item.addEventListener('click', (e) => {
+        const btn = e.currentTarget;
+        const email = btn.dataset.email;
+        const name = btn.dataset.name;
+
+        // Update Global profiles data
+        APP_STATE.isLoggedIn = true;
+        APP_STATE.userEmail = email;
+        APP_STATE.userName = name;
+
+        // Persist local storage keys
+        localStorage.setItem('neonpulse_email', email);
+        localStorage.setItem('neonpulse_name', name);
+
+        // Customize layout UI Initials and badges
+        const initials = name.split(' ').filter(v => v).take(2).map(v => v[0].uppercase || v[0].toUpperCase()).join('') || "JD";
+        document.getElementById('user-avatar-initials').textContent = initials;
+
+        // Close picker modal
+        document.getElementById('google-account-modal').classList.add('hidden');
+
+        // Prime standard studio logging feed
+        APP_STATE.diagnosticLogs = [
+          "▶ Auth session generated successfully.",
+          `▶ Google Account: ${email}`,
+          "▶ Gemini Nano Banana 2 Offline core locked and verified."
+        ];
+        updateTerminalFeed(APP_STATE.diagnosticLogs, 'diagnostic-logs');
+
+        navigateToScreen('workbench');
+        showAndroidToast(`Authenticated as ${name}`);
+      });
+    });
+
+    // Sign out trigger action
+    document.getElementById('btn-logout').addEventListener('click', () => {
+      // Wipe cache keys
+      localStorage.removeItem('neonpulse_email');
+      localStorage.removeItem('neonpulse_name');
+
+      APP_STATE.isLoggedIn = false;
+      APP_STATE.userEmail = '';
+      APP_STATE.userName = '';
+      APP_STATE.originalImage = null;
+      APP_STATE.processedImage = null;
+      APP_STATE.isDemoMode = false;
+
+      syncWorkbenchViewport();
+      navigateToScreen('login');
+      showAndroidToast("Logged out successfully");
+    });
+
+    // Load Demo Vector Sunset Action
+    document.getElementById('btn-load-demo').addEventListener('click', () => {
+      APP_STATE.isDemoMode = true;
+      
+      const demoCanvas = createDemoRetroCanvas();
+      
+      // Save canvas directly as image container
+      APP_STATE.originalImage = demoCanvas;
+      APP_STATE.processedImage = null;
+
+      // Log actions
+      APP_STATE.diagnosticLogs = [
+        "▶ Booted high-definition retro vector test sunset pattern.",
+        "▶ Safe Resolution bounding bounds: 500x500 px"
+      ];
+      updateTerminalFeed(APP_STATE.diagnosticLogs, 'diagnostic-logs');
+
+      syncWorkbenchViewport();
+      showAndroidToast("Demo matrix vector loaded");
+    });
+
+    // Upload Trigger Invisible Action
+    document.getElementById('btn-upload-trigger').addEventListener('click', () => {
+      document.getElementById('image-upload').click();
+    });
+
+    // Upload File Handler loader
+    document.getElementById('image-upload').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const img = new Image();
+        img.onload = function() {
+          // Downscale load source to safe bounds to avoid buffer spikes on slow client chips
+          const maxDim = 640;
+          let w = img.width;
+          let h = img.height;
+          
+          if (w > maxDim || h > maxDim) {
+            if (w > h) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            } else {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
+          }
+
+          const scaleCanvas = document.createElement('canvas');
+          scaleCanvas.width = w;
+          scaleCanvas.height = h;
+          const scaleCtx = scaleCanvas.getContext('2d');
+          scaleCtx.drawImage(img, 0, 0, w, h);
+
+          APP_STATE.originalImage = scaleCanvas;
+          APP_STATE.processedImage = null;
+          APP_STATE.isDemoMode = false;
+
+          APP_STATE.diagnosticLogs = [
+            "▶ Imported target image successfully.",
+            `▶ Dimension workspace scale: ${w}x${h} px`
+          ];
+          updateTerminalFeed(APP_STATE.diagnosticLogs, 'diagnostic-logs');
+
+          syncWorkbenchViewport();
+          showAndroidToast("Imported photo successfully!");
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Slider Listeners Update Indicators
+    const denoiseSlider = document.getElementById('slider-denoise');
+    const denoiseValTxt = document.getElementById('val-denoise');
+    const noisePercentageTxt = document.getElementById('label-noise-percentage');
+
+    denoiseSlider.addEventListener('input', (e) => {
+      const val = e.target.value;
+      APP_STATE.denoise = val;
+      denoiseValTxt.textContent = `${val}%`;
+      noisePercentageTxt.textContent = `${val}.00%`;
+    });
+
+    const sharpenSlider = document.getElementById('slider-sharpen');
+    const sharpenValTxt = document.getElementById('val-sharpen');
+
+    sharpenSlider.addEventListener('input', (e) => {
+      const val = e.target.value;
+      APP_STATE.sharpen = val;
+      sharpenValTxt.textContent = `${val}%`;
+    });
+
+    // Switch check controls
+    const switch8k = document.getElementById('switch-8k');
+    const bgSwitch8k = document.getElementById('bg-switch-8k');
+    const dotSwitch8k = document.getElementById('dot-switch-8k');
+    const resLabel = document.getElementById('label-res-label');
+
+    function sync8kSwitchUI() {
+      if (switch8k.checked) {
+        bgSwitch8k.className = "w-10 h-5 bg-neonCyan/30 rounded-full transition-colors border border-neonCyan/40";
+        dotSwitch8k.className = "absolute left-5.5 top-0.5 w-4 h-4 bg-neonCyan rounded-full transition-transform shadow-[0_0_8px_#00FFFF]";
+        resLabel.textContent = "8K";
+        APP_STATE.use8K = true;
+      } else {
+        bgSwitch8k.className = "w-10 h-5 bg-white/10 rounded-full transition-colors border border-white/5";
+        dotSwitch8k.className = "absolute left-0.5 top-0.5 w-4 h-4 bg-gray-400 rounded-full transition-transform";
+        resLabel.textContent = "1080P";
+        APP_STATE.use8K = false;
+      }
+    }
+    switch8k.addEventListener('change', sync8kSwitchUI);
+    // Trigger initial styles placement
+    sync8kSwitchUI();
+
+    const switchChroma = document.getElementById('switch-chroma');
+    const bgSwitchChroma = document.getElementById('bg-switch-chroma');
+    const dotSwitchChroma = document.getElementById('dot-switch-chroma');
+
+    function syncChromaSwitchUI() {
+      if (switchChroma.checked) {
+        bgSwitchChroma.className = "w-10 h-5 bg-neonPink/30 rounded-full transition-colors border border-neonPink/40";
+        dotSwitchChroma.className = "absolute left-5.5 top-0.5 w-4 h-4 bg-neonPink rounded-full transition-transform shadow-[0_0_8px_#FF00FF]";
+        APP_STATE.useChromaDrift = true;
+      } else {
+        bgSwitchChroma.className = "w-10 h-5 bg-white/10 rounded-full transition-colors border border-white/5";
+        dotSwitchChroma.className = "absolute left-0.5 top-0.5 w-4 h-4 bg-gray-400 rounded-full transition-transform";
+        APP_STATE.useChromaDrift = false;
+      }
+    }
+    switchChroma.addEventListener('change', syncChromaSwitchUI);
+    syncChromaSwitchUI();
+
+
+    // Trigger actual processing execution pass
+    document.getElementById('btn-enhance-trigger').addEventListener('click', () => {
+      startEnhancementPipeline();
+    });
+
+    // Reset workstation action
+    document.getElementById('btn-back-workbench').addEventListener('click', () => {
+      APP_STATE.processedImage = null;
+      navigateToScreen('workbench');
+      addWorkspaceLog("▶ Core returned to active workspace deck.");
+    });
+
+
+    // --- HOLD TO COMPARE LOGIC GRAPH TRANSITIONS ---
+    const holdCompareBtn = document.getElementById('btn-hold-compare');
+    const completedCompareLabel = document.getElementById('viewport-compare-overlay');
+
+    function toggleCompareActive() {
+      // Draw RAW original source
+      completedCanvas.width = APP_STATE.originalImage.width;
+      completedCanvas.height = APP_STATE.originalImage.height;
+      completedCtx.drawImage(APP_STATE.originalImage, 0, 0);
+
+      // Mutate UI visual tags
+      completedCompareLabel.textContent = "RAW SOURCE INTERRUPT";
+      completedCompareLabel.classList.remove('border-neonYellow', 'text-neonYellow');
+      completedCompareLabel.classList.add('border-neonPink', 'text-neonPink');
+      holdCompareBtn.classList.add('bg-neonPink/20');
+    }
+
+    function toggleCompareInactive() {
+      // Restore optimized pixels
+      completedCanvas.width = APP_STATE.processedImage.width;
+      completedCanvas.height = APP_STATE.processedImage.height;
+      completedCtx.drawImage(APP_STATE.processedImage, 0, 0);
+
+      completedCompareLabel.textContent = "OPTIMIZED SIGNAL PREVIEW";
+      completedCompareLabel.classList.remove('border-neonPink', 'text-neonPink');
+      completedCompareLabel.classList.add('border-neonYellow', 'text-neonYellow');
+      holdCompareBtn.classList.remove('bg-neonPink/20');
+    }
+
+    // Touch events for mobiles + mouse clicks for desktop double actions
+    holdCompareBtn.addEventListener('mousedown', toggleCompareActive);
+    holdCompareBtn.addEventListener('mouseup', toggleCompareInactive);
+    holdCompareBtn.addEventListener('mouseleave', toggleCompareInactive);
+
+    holdCompareBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      toggleCompareActive();
+    });
+    holdCompareBtn.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      toggleCompareInactive();
+    });
+
+
+    // --- HUD BOTTOM BAR NAVIGATION INTERACTION NOISE ---
+    document.getElementById('navbar-tab-hub').addEventListener('click', () => {
+      if (APP_STATE.isLoggedIn) {
+        navigateToScreen('workbench');
+      }
+    });
+
+    document.getElementById('navbar-tab-reels').addEventListener('click', () => {
+      if (APP_STATE.isLoggedIn) {
+        showAndroidToast("REELS: Simulated neural stream buffer online.");
+      }
+    });
+
+    document.getElementById('navbar-tab-lab').addEventListener('click', () => {
+      if (APP_STATE.isLoggedIn) {
+        showAndroidToast("LAB: Neural workspace parameters locked.");
+      }
+    });
+
+  </script>
 </body>
 </html>
