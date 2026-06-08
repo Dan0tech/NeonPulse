@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Enhancer Web</title>
+    <style>
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff00de;
+            --bg-color: #0a0a0a;
+            --container-bg: #141414;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            /* Neon text glow effect */
+            text-shadow: 0 0 5px #fff, 
+                         0 0 10px #fff, 
+                         0 0 20px var(--neon-blue), 
+                         0 0 30px var(--neon-blue), 
+                         0 0 40px var(--neon-blue);
+            margin-bottom: 50px;
+        }
+
+        .container {
+            background: var(--container-bg);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.15);
+            text-align: center;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--neon-blue);
+            padding: 50px 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(0, 243, 255, 0.02);
+        }
+
+        .upload-area:hover {
+            background: rgba(0, 243, 255, 0.1);
+            box-shadow: inset 0 0 15px rgba(0, 243, 255, 0.2);
+        }
+
+        .upload-area p {
+            font-size: 1.2rem;
+            color: var(--neon-blue);
+            margin: 0;
+            pointer-events: none;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        .preview-section {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .image-wrapper {
+            position: relative;
+            display: inline-block;
+            max-width: 100%;
+        }
+
+        img {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(255, 0, 222, 0.3);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            display: block;
+        }
+
+        /* The class added when the image is "enhanced" */
+        .enhanced {
+            filter: contrast(125%) saturate(140%) brightness(115%);
+            box-shadow: 0 0 30px var(--neon-pink);
+        }
+
+        .btn {
+            background: transparent;
+            color: var(--neon-pink);
+            border: 2px solid var(--neon-pink);
+            padding: 12px 40px;
+            font-size: 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 2px;
+            box-shadow: 0 0 15px rgba(255, 0, 222, 0.3);
+        }
+
+        .btn:hover {
+            background: var(--neon-pink);
+            color: #000;
+            box-shadow: 0 0 25px var(--neon-pink), 0 0 50px var(--neon-pink);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Neon Enhancer</h1>
+    
+    <div class="container">
+        <div class="upload-area" id="upload-area" onclick="document.getElementById('file-input').click()">
+            <p>Click or Drag Image to Upload</p>
+            <input type="file" id="file-input" accept="image/*" onchange="previewImage(event)">
+        </div>
+        
+        <div class="preview-section" id="preview-section">
+            <div class="image-wrapper">
+                <img id="image-preview" src="" alt="Your Uploaded Image">
+            </div>
+            <br>
+            <button class="btn" id="enhance-btn" onclick="toggleEnhance()">Enhance</button>
+        </div>
+    </div>
+
+    <script>
+        let isEnhanced = false;
+
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function() {
+                const output = document.getElementById('image-preview');
+                output.src = reader.result;
+                
+                // Reset state when a new image is uploaded
+                output.classList.remove('enhanced');
+                isEnhanced = false;
+                document.getElementById('enhance-btn').innerText = "Enhance";
+                
+                // Show the preview section and hide the upload area
+                document.getElementById('preview-section').style.display = 'block';
+                document.getElementById('upload-area').style.display = 'none';
+            }
+            reader.readAsDataURL(file);
+        }
+
+        function toggleEnhance() {
+            const img = document.getElementById('image-preview');
+            const btn = document.getElementById('enhance-btn');
+            
+            isEnhanced = !isEnhanced;
+
+            if (isEnhanced) {
+                // Apply the enhancement CSS class
+                img.classList.add('enhanced');
+                btn.innerText = "Revert";
+                btn.style.color = "var(--neon-blue)";
+                btn.style.borderColor = "var(--neon-blue)";
+                btn.style.boxShadow = "0 0 15px rgba(0, 243, 255, 0.3)";
+            } else {
+                // Remove enhancement
+                img.classList.remove('enhanced');
+                btn.innerText = "Enhance";
+                btn.style.color = "";
+                btn.style.borderColor = "";
+                btn.style.boxShadow = "";
+            }
+        }
+    </script>
+</body>
+</html>
